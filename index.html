@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Realtime Chat App</title>
+
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#43cea2,#185a9d);
+}
+.box{
+  width:360px;
+  background:#fff;
+  border-radius:16px;
+  padding:15px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.3);
+}
+h3{
+  text-align:center;
+  margin:5px 0 15px;
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:15px;
+}
+button{
+  background:#25d366;
+  color:white;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{
+  opacity:0.9;
+}
+#messages{
+  height:240px;
+  background:#f0f0f0;
+  padding:10px;
+  overflow-y:auto;
+  border-radius:12px;
+}
+.msg{
+  max-width:80%;
+  padding:8px 12px;
+  margin-bottom:8px;
+  border-radius:12px;
+  word-wrap:break-word;
+  font-size:14px;
+}
+.me{
+  background:#dcf8c6;
+  margin-left:auto;
+  text-align:right;
+}
+.other{
+  background:#ffffff;
+  margin-right:auto;
+}
+.hidden{
+  display:none;
+}
+.username{
+  font-size:11px;
+  color:#555;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN BOX -->
+<div class="box" id="loginBox">
+  <h3>🔐 Join Chat</h3>
+  <input id="user" placeholder="Enter your name">
+  <button onclick="login()">Enter</button>
+</div>
+
+<!-- CHAT BOX -->
+<div class="box hidden" id="chatBox">
+  <h3>💬 Realtime Chat</h3>
+  <div id="messages"></div>
+  <input id="msg" placeholder="Type a message">
+  <button onclick="sendMsg()">Send</button>
+</div>
+
+<script>
+/* 🔥 FIREBASE CONFIG (REPLACE THIS) */
+var firebaseConfig = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_PROJECT.firebaseapp.com",
+  databaseURL: "https://PASTE_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "PASTE_PROJECT",
+  storageBucket: "PASTE_PROJECT.appspot.com",
+  messagingSenderId: "PASTE_ID",
+  appId: "PASTE_APP_ID"
+};
+
+/* 🔥 INITIALIZE FIREBASE */
+firebase.initializeApp(firebaseConfig);
+var database = firebase.database();
+
+var currentUser = "";
+
+/* 🔐 LOGIN */
+function login(){
+  var u = document.getElementById("user").value.trim();
+  if(u === ""){
+    alert("Please enter your name");
+    return;
+  }
+  currentUser = u;
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("chatBox").classList.remove("hidden");
+}
+
+/* 💬 SEND MESSAGE */
+function sendMsg(){
+  var text = document.getElementById("msg").value.trim();
+  if(text === "") return;
+
+  database.ref("chat").push({
+    user: currentUser,
+    message: text,
+    time: Date.now()
+  });
+
+  document.getElementById("msg").value = "";
+}
+
+/* 🔁 RECEIVE MESSAGE */
+database.ref("chat").on("child_added", function(snapshot){
+  var data = snapshot.val();
+
+  var div = document.createElement("div");
+  div.classList.add("msg");
+
+  if(data.user === currentUser){
+    div.classList.add("me");
+  } else {
+    div.classList.add("other");
+  }
+
+  div.innerHTML =
+    "<div class='username'>" + data.user + "</div>" +
+    data.message;
+
+  document.getElementById("messages").appendChild(div);
+
+  // auto scroll
+  var messages = document.getElementById("messages");
+  messages.scrollTop = messages.scrollHeight;
+});
+</script>
+
+</body>
+</html>
