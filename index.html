@@ -84,14 +84,14 @@ button:hover{
 
 <body>
 
-<!-- LOGIN BOX -->
+<!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>🔐 Join Chat</h3>
   <input id="user" placeholder="Enter your name">
   <button onclick="login()">Enter</button>
 </div>
 
-<!-- CHAT BOX -->
+<!-- CHAT -->
 <div class="box hidden" id="chatBox">
   <h3>💬 Realtime Chat</h3>
   <div id="messages"></div>
@@ -100,28 +100,28 @@ button:hover{
 </div>
 
 <script>
-/* 🔥 FIREBASE CONFIG (REPLACE THIS) */
+/* 🔥 FIREBASE CONFIG (REPLACE WITH YOUR OWN) */
 var firebaseConfig = {
-  apiKey: "PASTE_API_KEY",
-  authDomain: "PASTE_PROJECT.firebaseapp.com",
-  databaseURL: "https://PASTE_PROJECT-default-rtdb.firebaseio.com",
-  projectId: "PASTE_PROJECT",
-  storageBucket: "PASTE_PROJECT.appspot.com",
-  messagingSenderId: "PASTE_ID",
-  appId: "PASTE_APP_ID"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
-/* 🔥 INITIALIZE FIREBASE */
+/* INITIALIZE FIREBASE */
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 
 var currentUser = "";
 
-/* 🔐 LOGIN */
+/* LOGIN */
 function login(){
   var u = document.getElementById("user").value.trim();
   if(u === ""){
-    alert("Please enter your name");
+    alert("Enter name");
     return;
   }
   currentUser = u;
@@ -129,7 +129,7 @@ function login(){
   document.getElementById("chatBox").classList.remove("hidden");
 }
 
-/* 💬 SEND MESSAGE */
+/* SEND MESSAGE */
 function sendMsg(){
   var text = document.getElementById("msg").value.trim();
   if(text === "") return;
@@ -143,7 +143,7 @@ function sendMsg(){
   document.getElementById("msg").value = "";
 }
 
-/* 🔁 RECEIVE MESSAGE */
+/* RECEIVE MESSAGES */
 database.ref("chat").on("child_added", function(snapshot){
   var data = snapshot.val();
 
@@ -165,6 +165,13 @@ database.ref("chat").on("child_added", function(snapshot){
   // auto scroll
   var messages = document.getElementById("messages");
   messages.scrollTop = messages.scrollHeight;
+});
+
+/* ENTER KEY SEND */
+document.getElementById("msg").addEventListener("keypress", function(e){
+  if(e.key === "Enter"){
+    sendMsg();
+  }
 });
 </script>
 
